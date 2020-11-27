@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -111,29 +110,21 @@ func moveSecret(client *vault_api.Client, data []map[string]interface{}) {
 	c := client.Logical()
 	for _, val := range data {
 		log.Infof("Processing %v", val["source"])
-		secretData, err := c.Read(fmt.Sprintf("%v", val["source"]))
+		sourcePath := fmt.Sprintf("%v", val["source"])
+		secretData, err := c.Read(sourcePath)
 		if err != nil {
 			log.Error(err)
 		}
-		_, err = c.Delete(fmt.Sprintf("%v", val["source"]))
+		_, err = c.Delete(sourcePath)
 		if (err != nil) {
 			log.Error(err)
 		}
-		destroyMetadata := secretData.Data
-		if (val["permanently"] == true) {
-			fmt.Println(destroyMetadata)
-			// c.Write(fmt.Sprintf("%v", val["dest"]),)
-			// destroyMetadata["data"]["metadata"]["destroyed"] = true
-			completeDestroy := map[string]interface{
-				"data" : {
-					"metadata": {
-						"destroyed": true,
-					},
-				},
-			}
-			config, _ := json.Marshal(completeDestroy)
-			c.Write(fmt.Sprintf("%v", val["dest"]), config)
-		}
-		// c.Write(fmt.Sprintf("%v", val["dest"]), secretData.Data)
+		
+		// if (val["permanently"] == true) {
+		// 	fmt.Println("DESTROY")
+		// 	c.DeleteWithData(sourcePath, )
+		// }
+		fmt.Println(secretData.Data)
+		c.Write(fmt.Sprintf("%v", val["dest"]), secretData.Data)
 	}
 }
