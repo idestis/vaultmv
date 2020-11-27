@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	vault_api "github.com/hashicorp/vault/api"
 	log "github.com/sirupsen/logrus"
@@ -40,10 +42,11 @@ Complete documentation available on https://vaultmv.github.io/#go`,
 					break
 				}
 				if (len(record) > 1) {
+					permanently, _ := strconv.ParseBool(record[2])
 					data = append(data, map[string]interface{}{
 						"source": record[0],
 						"dest": record[1],
-						"clean_source": record[2],
+						"permanently": permanently,
 					})
 				}
 			}
@@ -51,7 +54,7 @@ Complete documentation available on https://vaultmv.github.io/#go`,
 			data = append(data, map[string]interface{}{
 				"source": source,
 				"dest": destination,
-				"clean_source": true,
+				"permanently": true,
 			})
 		}
 		moveSecret(client, data)
@@ -61,7 +64,7 @@ Complete documentation available on https://vaultmv.github.io/#go`,
 func init() {
 	goСmd.Flags().String("source", "", "Source path at the Hashicorp Vault")
 	goСmd.Flags().String("dest", "", "Destination path at the Hashicorp Vault")
-	goСmd.Flags().Bool("clean_source", true, "Delete source path after move")
+	goСmd.Flags().Bool("permanently", true, "Delete source path permanently")
 	goСmd.Flags().String("data", "", "Path to CSV data file for the bulk action")
 	rootCmd.AddCommand(goСmd)
 }
@@ -107,10 +110,30 @@ func moveSecret(client *vault_api.Client, data []map[string]interface{}) {
 	// TODO: Current method is loop. Create same using go routines.
 	c := client.Logical()
 	for _, val := range data {
+		log.Infof("Processing %v", val["source"])
 		secretData, err := c.Read(fmt.Sprintf("%v", val["source"]))
 		if err != nil {
 			log.Error(err)
 		}
-		fmt.Println(secretData.Data["data"])
+		_, err = c.Delete(fmt.Sprintf("%v", val["source"]))
+		if (err != nil) {
+			log.Error(err)
+		}
+		destroyMetadata := secretData.Data
+		if (val["permanently"] == true) {
+			fmt.Println(destroyMetadata)
+			// c.Write(fmt.Sprintf("%v", val["dest"]),)
+			// destroyMetadata["data"]["metadata"]["destroyed"] = true
+			completeDestroy := map[string]interface{
+				"data" : {
+					"metadata": {
+						"destroyed": true,
+					},
+				},
+			}
+			config, _ := json.Marshal(completeDestroy)
+			c.Write(fmt.Sprintf("%v", val["dest"]), config)
+		}
+		// c.Write(fmt.Sprintf("%v", val["dest"]), secretData.Data)
 	}
 }
