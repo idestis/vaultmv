@@ -124,7 +124,7 @@ func moveSecret(client *vault_api.Client, data []map[string]interface{}) {
 		// 	fmt.Println("DESTROY")
 		// 	c.DeleteWithData(sourcePath, )
 		// }
-		fmt.Println(secretData.Data)
+		// fmt.Println(secretData.Data)
 		c.Write(fmt.Sprintf("%v", val["dest"]), secretData.Data)
 	}
 }

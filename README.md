@@ -23,16 +23,22 @@ First two fields is to define **secret path movements**, the third one is design
 
 ### Examples:
 
+In example below we are trying to solve two issues:
+
+- We need to move **secret/foo/bar** to **secret/bar/foo**
+- We need to extend path **secret/services/awesome** to **secret/services/awesome/fonts** to be able to use space in **secret/services/awesome** with additonal paths.
+
 **KV API V1**
 
 ```csv
-secrets/foo/bar,secrets/foo/bar/environment,true
+secrets/foo/bar,secrets/bar/foo,true
 secrets/services/awesome,secrets/services/awesome/fonts,true
 ```
 
 **KV API V2** require us to write addional information to the path.
 
 ```csv
-secret/data/foo/bar,secret/data/foo/bar/environment,true
+secret/data/foo/bar,secret/data/bar/foo,true
 secret/data/services/awesome,secret/data/services/awesome/fonts,true
 ```
+
