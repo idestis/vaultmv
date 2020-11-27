@@ -107,10 +107,10 @@ func moveSecret(client *vault_api.Client, data []map[string]interface{}) {
 	// TODO: Current method is loop. Create same using go routines.
 	c := client.Logical()
 	for _, val := range data {
-		secretData, err := c.Read(fmt.Sprintf("%v?version=1", val["source"]))
+		secretData, err := c.Read(fmt.Sprintf("%v", val["source"]))
 		if err != nil {
 			log.Error(err)
 		}
-		fmt.Println(secretData.Data)
+		fmt.Println(secretData.Data["data"])
 	}
 }
