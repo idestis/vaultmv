@@ -49,6 +49,12 @@ secret/data/foo/bar,secret/data/bar/foo,true
 secret/data/services/awesome,secret/data/services/awesome/fonts,true
 ```
 
+Then just run the tool with flag `--data`
+
+```bash
+$ vaultmv do --data=path/to/csv/file
+```
+
 ## Install
 
 #### **Binary**
