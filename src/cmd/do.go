@@ -101,7 +101,6 @@ func vaultAuth(server string, token string) *vault_api.Client {
 		log.Error("VAULT_TOKEN was not found at this environment, you can use --token flag to authorize")
 		os.Exit(89)
 	}
-	// fmt.Print(client.Logical().Read("/secrets/foo/bar"))
 	return client
 }
 
@@ -119,12 +118,6 @@ func moveSecret(client *vault_api.Client, data []map[string]interface{}) {
 		if (err != nil) {
 			log.Error(err)
 		}
-		
-		// if (val["permanently"] == true) {
-		// 	fmt.Println("DESTROY")
-		// 	c.DeleteWithData(sourcePath, )
-		// }
-		// fmt.Println(secretData.Data)
 		c.Write(fmt.Sprintf("%v", val["dest"]), secretData.Data)
 	}
 }
