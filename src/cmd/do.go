@@ -14,19 +14,22 @@ import (
 var dataFile string;
 
 var goСmd = &cobra.Command{
-	Use:   "go (--source=[path] | --dest=[path] | --clean_source | --data=[csv])",
+	Use:   "do (--source=[path] | --dest=[path] | --clean_source | --data=[csv])",
 	Short: "Execute move",
 	Args: cobra.MaximumNArgs(0),
-	Long: `vaultmv go
+	Long: `vaultmv do
 ============
 Execute move of the path based on arguments
-Complete documentation available on https://vaultmv.github.io/#go`,
+Complete documentation available on https://vaultmv.github.io/#do`,
 	Run: func(goCmd *cobra.Command, args []string) {
 		source, _ := goCmd.Flags().GetString("source")
 		destination, _ := goCmd.Flags().GetString("dest")
 		client := vaultAuth(vaultSrv, vaultToken)
 		dataFile, _ = goCmd.Flags().GetString("data")
-
+		if (dataFile == "") || (source == "" && destination == "") {
+			log.Error("Sorry, the vaultmv can't understand what actually you need to move. Please refer to help with -h")
+			os.Exit(1)
+		}
 		data := make([]map[string]interface{}, 0)
 		if (dataFile != "") {
 			file, err := os.Open(dataFile)
