@@ -26,7 +26,7 @@ Complete documentation available on https://vaultmv.github.io/#do`,
 		destination, _ := goCmd.Flags().GetString("dest")
 		client := vaultAuth(vaultSrv, vaultToken)
 		dataFile, _ = goCmd.Flags().GetString("data")
-		if (dataFile == "") || (source == "" && destination == "") {
+		if dataFile == "" && (source == "" || destination == "") {
 			log.Error("Sorry, the vaultmv can't understand what actually you need to move. Please refer to help with -h")
 			os.Exit(1)
 		}
